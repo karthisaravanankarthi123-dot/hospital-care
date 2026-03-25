@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { HomeIcon, ShortsIcon, DetailsIcon, ProfileIcon } from './NavigationIcons';
 
 const { width } = Dimensions.get('window');
 
@@ -24,6 +25,7 @@ const ProfileScreen = ({
   onSearchPress,
   onShortsPress,
   onBusinessDetailsPress,
+  onChangePinPress,
   onLogout,
   userData,
 }: {
@@ -32,6 +34,7 @@ const ProfileScreen = ({
   onSearchPress?: () => void;
   onShortsPress: () => void;
   onBusinessDetailsPress?: () => void;
+  onChangePinPress?: () => void;
   onLogout?: () => void;
   userData?: any;
 }) => {
@@ -44,6 +47,7 @@ const ProfileScreen = ({
     value, 
     onPress, 
     rightElement,
+    rightValue,
     iconColor = "#007AFF"
   }: { 
     icon: string; 
@@ -51,6 +55,7 @@ const ProfileScreen = ({
     value?: string; 
     onPress?: () => void;
     rightElement?: React.ReactNode;
+    rightValue?: string;
     iconColor?: string;
   }) => (
     <TouchableOpacity 
@@ -63,12 +68,21 @@ const ProfileScreen = ({
         <MaterialCommunityIcons name={icon as any} size={24} color={iconColor} />
       </View>
       <View style={styles.settingInfo}>
-        <Text style={styles.settingLabel}>{label}</Text>
-        {value && <Text style={styles.settingValue}>{value}</Text>}
+        {value ? (
+          <>
+            <Text style={styles.settingLabel}>{label}</Text>
+            <Text style={styles.settingValue}>{value}</Text>
+          </>
+        ) : (
+          <Text style={styles.settingTitleOnly}>{label}</Text>
+        )}
       </View>
-      {rightElement ? rightElement : (
-        onPress && <Feather name="chevron-right" size={20} color="#A0AEC0" />
-      )}
+      <View style={styles.rightContent}>
+        {rightValue && <Text style={styles.rightValueText}>{rightValue}</Text>}
+        {rightElement ? rightElement : (
+          onPress && <Feather name="chevron-right" size={20} color="#A0AEC0" />
+        )}
+      </View>
     </TouchableOpacity>
   );
 
@@ -133,23 +147,16 @@ const ProfileScreen = ({
         {/* Settings Card */}
         <View style={styles.settingsCard}>
           <SettingItem 
-            icon="account-outline" 
+            icon="account" 
             label="Full Name" 
             value={(userData?.firstName || 'Sarah') + ' ' + (userData?.lastName || 'Wilson')} 
             iconColor="#007AFF"
             rightElement={<Feather name="edit-2" size={18} color="#A0AEC0" />}
           />
           <SettingItem 
-            icon="email-outline" 
+            icon="email" 
             label="Email" 
             value={userData?.email || 'sarahwilson@emaple.com'} 
-            iconColor="#007AFF"
-            rightElement={<Feather name="edit-2" size={18} color="#A0AEC0" />}
-          />
-          <SettingItem 
-            icon="cellphone" 
-            label="Mobile" 
-            value={userData?.mobile || '+1 555-019-8829'} 
             iconColor="#007AFF"
             rightElement={<Feather name="edit-2" size={18} color="#A0AEC0" />}
           />
@@ -168,13 +175,13 @@ const ProfileScreen = ({
             }
           />
           <SettingItem 
-            icon="lock-outline" 
+            icon="lock" 
             label="Change PIN" 
-            onPress={() => {}} 
+            onPress={onChangePinPress} 
             iconColor="#007AFF"
           />
           <SettingItem 
-            icon="bell-outline" 
+            icon="bell" 
             label="Notifications" 
             onPress={() => {}} 
             iconColor="#007AFF"
@@ -182,14 +189,9 @@ const ProfileScreen = ({
           <SettingItem 
             icon="earth" 
             label="Language" 
+            rightValue="English"
             onPress={() => {}} 
             iconColor="#007AFF"
-            rightElement={
-              <View style={styles.languageSelector}>
-                <Text style={styles.languageText}>English</Text>
-                <Feather name="chevron-down" size={16} color="#A0AEC0" />
-              </View>
-            }
           />
         </View>
 
@@ -207,18 +209,18 @@ const ProfileScreen = ({
       {/* Bottom Navigation */}
       <View style={[styles.bottomNav, { bottom: Math.max(insets.bottom, 20) }]}>
         <TouchableOpacity style={styles.navItem} onPress={onHomePress}>
-          <Feather name="home" size={24} color="#A0AEC0" />
+          <HomeIcon active={false} size={24} />
           <Text style={styles.navText}>Home</Text>
         </TouchableOpacity>
         
         {role === 'business' ? (
           <>
             <TouchableOpacity style={styles.navItem} onPress={onShortsPress}>
-              <MaterialCommunityIcons name="play-circle" size={24} color="#A0AEC0" />
+              <ShortsIcon active={false} size={24} />
               <Text style={styles.navText}>Shorts</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.navItem} onPress={onBusinessDetailsPress}>
-              <Feather name="home" size={24} color="#A0AEC0" />
+              <DetailsIcon active={false} size={24} />
               <Text style={styles.navText}>Details</Text>
             </TouchableOpacity>
           </>
@@ -229,7 +231,7 @@ const ProfileScreen = ({
               <Text style={styles.navText}>Search</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.navItem} onPress={onShortsPress}>
-              <MaterialCommunityIcons name="play-circle" size={24} color="#A0AEC0" />
+              <ShortsIcon active={false} size={24} />
               <Text style={styles.navText}>Shorts</Text>
             </TouchableOpacity>
           </>
@@ -237,7 +239,7 @@ const ProfileScreen = ({
 
         <TouchableOpacity style={styles.navItem}>
           <View style={styles.navActiveIndicatorPill}>
-            <Feather name="user" size={24} color="#FFFFFF" />
+            <ProfileIcon active={true} size={24} />
             <Text style={styles.navTextActive}>Profile</Text>
           </View>
         </TouchableOpacity>
@@ -402,6 +404,21 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginTop: 2,
   },
+  settingTitleOnly: {
+    fontSize: 16,
+    color: '#1A1C1E',
+    fontWeight: '700',
+  },
+  rightContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  rightValueText: {
+    fontSize: 15,
+    color: '#718096',
+    fontWeight: '500',
+  },
   languageSelector: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -457,12 +474,13 @@ const styles = StyleSheet.create({
   },
   navActiveIndicatorPill: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    width: '85%',
-    height: '85%',
-    borderRadius: 20,
+    height: 60,
+    paddingHorizontal: 12,
+    borderRadius: 18,
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 4,
+    gap: 2,
   },
   navText: {
     fontSize: 10,

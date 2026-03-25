@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { HomeIcon, ShortsIcon, DetailsIcon, ProfileIcon } from './NavigationIcons';
 
 const { width } = Dimensions.get('window');
 
@@ -84,6 +85,7 @@ const HomeScreen = ({
   onShortsPress,
   onShortPress,
   onProfilePress,
+  onDetailsPress,
   userData,
 }: {
   role?: string;
@@ -93,6 +95,7 @@ const HomeScreen = ({
   onShortsPress: () => void;
   onShortPress?: (short: any) => void;
   onProfilePress: () => void;
+  onDetailsPress?: () => void;
   userData?: any;
 }) => {
   const insets = useSafeAreaInsets();
@@ -303,24 +306,29 @@ const HomeScreen = ({
         >
           <TouchableOpacity style={styles.navItem}>
             <View style={styles.navActivePill}>
-              <Feather name="home" size={24} color="#FFFFFF" />
+              <HomeIcon active={true} size={24} />
               <Text style={styles.navActiveText}>Home</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
-            <MaterialCommunityIcons
-              name="play-circle-outline"
-              size={24}
-              color="#A0AEC0"
-            />
+          <TouchableOpacity 
+            style={styles.navItem} 
+            onPress={onShortsPress}
+          >
+            <ShortsIcon active={false} size={24} />
             <Text style={styles.navInactiveText}>Shorts</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
-            <Feather name="home" size={24} color="#A0AEC0" />
+          <TouchableOpacity 
+            style={styles.navItem} 
+            onPress={onDetailsPress}
+          >
+            <DetailsIcon active={false} size={24} />
             <Text style={styles.navInactiveText}>Details</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
-            <Feather name="user" size={24} color="#A0AEC0" />
+          <TouchableOpacity 
+            style={styles.navItem} 
+            onPress={onProfilePress}
+          >
+            <ProfileIcon active={false} size={24} />
             <Text style={styles.navInactiveText}>Profile</Text>
           </TouchableOpacity>
         </View>
@@ -555,34 +563,34 @@ const HomeScreen = ({
         >
           <TouchableOpacity style={styles.navItem}>
             <View style={styles.navActiveIndicatorPill}>
-              <Feather name="home" size={24} color="#FFFFFF" />
+              <HomeIcon active={true} size={24} />
               <Text style={styles.navTextActive}>Home</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.navItem} 
+          <TouchableOpacity
+            style={styles.navItem}
             onPress={role === 'business' ? onShortsPress : onSearchPress}
           >
             {role === 'business' ? (
-              <MaterialCommunityIcons name="play-circle-outline" size={24} color="#A0AEC0" />
+              <ShortsIcon active={false} size={24} />
             ) : (
               <Feather name="search" size={24} color="#A0AEC0" />
             )}
             <Text style={styles.navText}>{role === 'business' ? 'Shorts' : 'Search'}</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.navItem} 
+          <TouchableOpacity
+            style={styles.navItem}
             onPress={role === 'business' ? onDetailsPress : onShortsPress}
           >
             {role === 'business' ? (
-              <Feather name="home" size={24} color="#A0AEC0" />
+              <DetailsIcon active={false} size={24} />
             ) : (
-              <MaterialCommunityIcons name="play-circle-outline" size={24} color="#A0AEC0" />
+              <ShortsIcon active={false} size={24} />
             )}
             <Text style={styles.navText}>{role === 'business' ? 'Details' : 'Shorts'}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.navItem} onPress={onProfilePress}>
-            <Feather name="user" size={24} color="#A0AEC0" />
+            <ProfileIcon active={false} size={24} />
             <Text style={styles.navText}>Profile</Text>
           </TouchableOpacity>
         </View>
@@ -970,13 +978,13 @@ const styles = StyleSheet.create({
   },
   navActivePill: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    height: 56,
-    paddingHorizontal: 16,
-    borderRadius: 28,
-    flexDirection: 'row',
+    height: 60,
+    paddingHorizontal: 12,
+    borderRadius: 18,
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
+    gap: 2,
   },
   navActiveText: {
     color: '#FFFFFF',

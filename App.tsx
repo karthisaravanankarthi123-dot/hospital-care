@@ -28,9 +28,18 @@ import VideoPlayerScreen from './src/components/VideoPlayerScreen';
 import MembershipScreen from './src/components/MembershipScreen';
 import ProfileScreen from './src/components/ProfileScreen';
 import BusinessDetailsScreen from './src/components/BusinessDetailsScreen';
+import BusineessuserDetailsScreen from './src/components/BusineessuserDetailsScreen';
+import BusinessShortsScreen from './src/components/BusinessShortsScreen';
+import BusinessAllShortsScreen from './src/components/BusinessAllShortsScreen';
+import AIShortGenerateScreen from './src/components/AIShortGenerateScreen';
 import PinCreationScreen from './src/components/PinCreationScreen';
 import LoginScreen from './src/components/LoginScreen';
 import BusinessPinLoginScreen from './src/components/BusinessPinLoginScreen';
+import AIPreviewScreen from './src/components/AIPreviewScreen';
+import PublishSettingsScreen from './src/components/PublishSettingsScreen';
+import ChangePinScreen from './src/components/ChangePinScreen';
+import PaymentScreen from './src/components/PaymentScreen';
+import PaymentSuccessScreen from './src/components/PaymentSuccessScreen';
 
 function AppContent(): React.JSX.Element {
   const insets = useSafeAreaInsets();
@@ -63,6 +72,14 @@ function AppContent(): React.JSX.Element {
   const [showBusinessLogin, setShowBusinessLogin] = useState(false);
   const [showBusinessPinLogin, setShowBusinessPinLogin] = useState(false);
   const [registeredPin, setRegisteredPin] = useState('');
+  const [showBusinessAllShorts, setShowBusinessAllShorts] = useState(false);
+  const [showAIShortGenerate, setShowAIShortGenerate] = useState(false);
+  const [showAIPreview, setShowAIPreview] = useState(false);
+  const [showPublishSettings, setShowPublishSettings] = useState(false);
+  const [showChangePin, setShowChangePin] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
+  const [selectedPlanData, setSelectedPlanData] = useState<any>(null);
   const [lastAuthScreen, setLastAuthScreen] = useState<'biometrics' | 'face' | null>(null);
   const [authMethod, setAuthMethod] = useState<'mobile' | 'social' | null>(null);
 
@@ -81,29 +98,66 @@ function AppContent(): React.JSX.Element {
       if (showVideoPlayer) {
         setShowVideoPlayer(false);
         setSelectedShort(null);
+        return true;
       } else if (showProfileScreen) {
         setShowProfileScreen(false);
+        return true;
       } else if (showMembershipScreen) {
         setShowMembershipScreen(false);
+        return true;
       } else if (showClinicDetails) {
         setShowClinicDetails(false);
         setSelectedClinic(null);
+        return true;
       } else if (showSearchScreen) {
         setShowSearchScreen(false);
+        return true;
+      } else if (showChangePin) {
+        setShowChangePin(false);
+        setShowProfileScreen(true);
+        return true;
+      } else if (showPaymentSuccess) {
+        setShowPaymentSuccess(false);
+        setShowPayment(true);
+        return true;
+      } else if (showPayment) {
+        setShowPayment(false);
+        setShowMembershipScreen(true);
+        return true;
+      } else if (showPublishSettings) {
+        setShowPublishSettings(false);
+        setShowAIPreview(true);
+        return true;
+      } else if (showAIPreview) {
+        setShowAIPreview(false);
+        setShowAIShortGenerate(true);
+        return true;
+      } else if (showAIShortGenerate) {
+        setShowAIShortGenerate(false);
+        return true;
+      } else if (showBusinessAllShorts) {
+        setShowBusinessAllShorts(false);
+        return true;
       } else if (showShortsScreen) {
         setShowShortsScreen(false);
+        return true;
+      } else if (showBusinessDetails) {
+        setShowBusinessDetails(false);
+        if (!isLoggedIn) {
+          setShowLocation(true);
+        }
+        return true;
       } else if (isLoggedIn) {
         BackHandler.exitApp();
         return true;
       } else if (showManualLocation) {
         setShowManualLocation(false);
         setShowLocation(true);
-      } else if (showBusinessDetails) {
-        setShowBusinessDetails(false);
-        setShowLocation(true);
+        return true;
       } else if (showLocation) {
         setShowLocation(false);
         setShowCompleteProfile(true);
+        return true;
       } else if (showCompleteProfile) {
         setShowCompleteProfile(false);
         if (lastAuthScreen === 'face') {
@@ -111,17 +165,24 @@ function AppContent(): React.JSX.Element {
         } else {
           setShowBiometrics(true);
         }
+        return true;
       } else if (showFaceRecognition) {
         setShowFaceRecognition(false);
         setShowBiometrics(true);
+        return true;
       } else if (showBiometrics) {
         setShowBiometrics(false);
         if (authMethod === 'mobile') {
           setShowMobileVerification(true);
+        } else {
+          setIsLoggedIn(false);
+          setShowBusinessLogin(true);
         }
+        return true;
       } else if (showBusinessPinLogin) {
         setShowBusinessPinLogin(false);
         setShowBusinessLogin(true);
+        return true;
       } else if (showBusinessLogin) {
         setShowBusinessLogin(false);
         setSelectedRole(null);
@@ -170,6 +231,16 @@ function AppContent(): React.JSX.Element {
     showProfileScreen,
     showBusinessPinLogin,
     registeredPin,
+    showBusinessAllShorts,
+    showAIShortGenerate,
+    showAIPreview,
+    showPublishSettings,
+    showPinCreation,
+    showBusinessLogin,
+    showChangePin,
+    showPayment,
+    showPaymentSuccess,
+    showMembershipScreen,
   ]);
 
   if (isLoading) {
@@ -181,9 +252,55 @@ function AppContent(): React.JSX.Element {
       return (
         <MembershipScreen
           onBack={() => setShowMembershipScreen(false)}
-          onContinue={(planId) => {
-            console.log('Selected Plan:', planId);
+          onContinue={(plan) => {
+            setSelectedPlanData(plan);
             setShowMembershipScreen(false);
+            setShowPayment(true);
+          }}
+        />
+      );
+    }
+
+    if (showPayment) {
+      return (
+        <PaymentScreen
+          selectedPlan={selectedPlanData || { id: 'pro', title: 'CLINIC PRO', price: '$149.99' }}
+          onBack={() => {
+            setShowPayment(false);
+            setShowMembershipScreen(true);
+          }}
+          onPay={() => {
+            setShowPayment(false);
+            setShowPaymentSuccess(true);
+          }}
+        />
+      );
+    }
+
+    if (showPaymentSuccess) {
+      return (
+        <PaymentSuccessScreen
+          planDetails={selectedPlanData || { id: 'pro', title: 'CLINIC PRO', price: '$149.99' }}
+          onGoToDashboard={() => {
+            setShowPaymentSuccess(false);
+            // Optionally: if guest upgraded, we could update role here,
+            // but for now just returning to the guest home screen as requested.
+          }}
+          onDownloadReceipt={() => console.log('Download Receipt')}
+        />
+      );
+    }
+
+    if (showChangePin) {
+      return (
+        <ChangePinScreen
+          onBack={() => {
+            setShowChangePin(false);
+            setShowProfileScreen(true);
+          }}
+          currentPin={registeredPin}
+          onPinChange={(newPin) => {
+            setRegisteredPin(newPin);
           }}
         />
       );
@@ -207,10 +324,34 @@ function AppContent(): React.JSX.Element {
             setShowProfileScreen(false);
             setShowBusinessDetails(true);
           }}
+          onChangePinPress={() => {
+            setShowProfileScreen(false);
+            setShowChangePin(true);
+          }}
           onLogout={() => {
             setIsLoggedIn(false);
             setShowProfileScreen(false);
             setShowBusinessLogin(true);
+          }}
+        />
+      );
+    }
+
+    if (showBusinessDetails) {
+      return (
+        <BusineessuserDetailsScreen
+          navigation={{
+            navigate: (screen: string) => {
+              if (screen === 'HomeScreen') setShowBusinessDetails(false);
+              else if (screen === 'ShortsScreen') {
+                setShowBusinessDetails(false);
+                setShowShortsScreen(true);
+              } else if (screen === 'ProfileScreen') {
+                setShowBusinessDetails(false);
+                setShowProfileScreen(true);
+              }
+            },
+            goBack: () => setShowBusinessDetails(false),
           }}
         />
       );
@@ -242,8 +383,92 @@ function AppContent(): React.JSX.Element {
       );
     }
 
+    if (showAIShortGenerate) {
+      return (
+        <AIShortGenerateScreen
+          navigation={{
+            goBack: () => setShowAIShortGenerate(false),
+            navigate: (screen: string) => {
+              if (screen === 'AIPreviewScreen') {
+                setShowAIShortGenerate(false);
+                setShowAIPreview(true);
+              }
+            }
+          }}
+        />
+      );
+    }
+
+    if (showAIPreview) {
+      return (
+        <AIPreviewScreen
+          onBack={() => {
+            setShowAIPreview(false);
+            setShowAIShortGenerate(true);
+          }}
+          onEdit={() => {
+            setShowAIPreview(false);
+            setShowAIShortGenerate(true);
+          }}
+          onSettings={() => {
+            setShowAIPreview(false);
+            setShowPublishSettings(true);
+          }}
+        />
+      );
+    }
+
+    if (showPublishSettings) {
+      return (
+        <PublishSettingsScreen
+          onBack={() => {
+            setShowPublishSettings(false);
+            setShowAIPreview(true);
+          }}
+          onPublish={() => {
+            setShowPublishSettings(false);
+            setShowBusinessDetails(false);
+            setShowShortsScreen(false);
+            // Go to dashboard
+          }}
+        />
+      );
+    }
+
+
+    if (showBusinessAllShorts) {
+      return (
+        <BusinessAllShortsScreen
+          navigation={{
+            goBack: () => setShowBusinessAllShorts(false),
+          }}
+        />
+      );
+    }
 
     if (showShortsScreen) {
+      if (selectedRole === 'business') {
+        return (
+          <BusinessShortsScreen
+            navigation={{
+              navigate: (screen: string) => {
+                if (screen === 'HomeScreen') setShowShortsScreen(false);
+                else if (screen === 'DetailsScreen') {
+                  setShowShortsScreen(false);
+                  setShowBusinessDetails(true);
+                } else if (screen === 'ProfileScreen') {
+                  setShowShortsScreen(false);
+                  setShowProfileScreen(true);
+                } else if (screen === 'ShortGenerateScreen') {
+                  setShowAIShortGenerate(true);
+                } else if (screen === 'AllShortsScreen') {
+                  setShowBusinessAllShorts(true);
+                }
+              },
+            }}
+          />
+        );
+      }
       return (
         <ShortsScreen
           role={selectedRole || 'guest'}
@@ -259,6 +484,10 @@ function AppContent(): React.JSX.Element {
           onProfilePress={() => {
             setShowShortsScreen(false);
             setShowProfileScreen(true);
+          }}
+          onDetailsPress={() => {
+            setShowShortsScreen(false);
+            setShowBusinessDetails(true);
           }}
         />
       );
@@ -281,6 +510,10 @@ function AppContent(): React.JSX.Element {
             setShowSearchScreen(false);
             setShowProfileScreen(true);
           }}
+          onDetailsPress={() => {
+            setShowSearchScreen(false);
+            setShowBusinessDetails(true);
+          }}
         />
       );
     }
@@ -299,6 +532,7 @@ function AppContent(): React.JSX.Element {
           setShowVideoPlayer(true);
         }}
         onProfilePress={() => setShowProfileScreen(true)}
+        onDetailsPress={() => setShowBusinessDetails(true)}
       />
     );
   }
@@ -426,12 +660,57 @@ function AppContent(): React.JSX.Element {
           }}
           onContinue={() => {
             setShowBusinessDetails(false);
-            setShowBusinessLogin(true);
+            setShowMembershipScreen(true);
           }}
           onSkip={() => {
             setShowBusinessDetails(false);
+            setShowMembershipScreen(true);
+          }}
+        />
+      );
+    }
+
+    if (showMembershipScreen) {
+      return (
+        <MembershipScreen
+          onBack={() => {
+            setShowMembershipScreen(false);
+            setShowBusinessDetails(true);
+          }}
+          onContinue={(plan) => {
+            setSelectedPlanData(plan);
+            setShowMembershipScreen(false);
+            setShowPayment(true);
+          }}
+        />
+      );
+    }
+
+    if (showPayment) {
+      return (
+        <PaymentScreen
+          selectedPlan={selectedPlanData || { id: 'pro', title: 'CLINIC PRO', price: '$149.99' }}
+          onBack={() => {
+            setShowPayment(false);
+            setShowMembershipScreen(true);
+          }}
+          onPay={() => {
+            setShowPayment(false);
+            setShowPaymentSuccess(true);
+          }}
+        />
+      );
+    }
+
+    if (showPaymentSuccess) {
+      return (
+        <PaymentSuccessScreen
+          planDetails={selectedPlanData || { id: 'pro', title: 'CLINIC PRO', price: '$149.99' }}
+          onGoToDashboard={() => {
+            setShowPaymentSuccess(false);
             setShowBusinessLogin(true);
           }}
+          onDownloadReceipt={() => console.log('Download Receipt')}
         />
       );
     }

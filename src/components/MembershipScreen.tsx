@@ -52,7 +52,7 @@ const PLANS: Plan[] = [
   },
 ];
 
-const MembershipScreen = ({ onContinue, onBack }: { onContinue: (planId: string) => void; onBack: () => void }) => {
+const MembershipScreen = ({ onContinue, onBack }: { onContinue: (plan: { id: string, title: string, price: string }) => void; onBack: () => void }) => {
   const insets = useSafeAreaInsets();
   const [selectedPlan, setSelectedPlan] = useState<string>('pro');
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
@@ -99,7 +99,6 @@ const MembershipScreen = ({ onContinue, onBack }: { onContinue: (planId: string)
               <TouchableOpacity
                 style={[
                   styles.planCard,
-                  plan.recommended && styles.proCard,
                   selectedPlan === plan.id && styles.selectedCard,
                   !plan.recommended && { marginTop: 10 }
                 ]}
@@ -109,7 +108,7 @@ const MembershipScreen = ({ onContinue, onBack }: { onContinue: (planId: string)
                 <Text style={[styles.planTitle, plan.recommended && styles.proTitle]}>{plan.title}</Text>
                 <View style={styles.priceRow}>
                   <Text style={styles.priceSymbol}>{plan.price}</Text>
-                  <Text style={styles.priceSub}> / Month</Text>
+                  <Text style={styles.priceSub}> / {billingCycle === 'monthly' ? 'Month' : 'year'}</Text>
                 </View>
                 {plan.subtitle ? <Text style={styles.planSubtitle}>{plan.subtitle}</Text> : null}
 
@@ -135,7 +134,12 @@ const MembershipScreen = ({ onContinue, onBack }: { onContinue: (planId: string)
       <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
         <TouchableOpacity
           style={styles.activateButton}
-          onPress={() => onContinue(selectedPlan)}
+          onPress={() => {
+            const plan = PLANS.find(p => p.id === selectedPlan);
+            if (plan) {
+              onContinue({ id: plan.id, title: plan.title, price: plan.price });
+            }
+          }}
         >
           <Text style={styles.activateText}>Activate Business Plan</Text>
         </TouchableOpacity>
@@ -226,7 +230,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   selectedCard: {
-    backgroundColor: '#FFFFFF',
+    borderColor: '#007AFF',
+    borderWidth: 2,
   },
   recommendedBadge: {
     position: 'absolute',

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -42,6 +42,7 @@ const BusinessDetailsScreen = ({
   onSkip: () => void;
 }) => {
   const insets = useSafeAreaInsets();
+  const scrollRef = useRef<ScrollView>(null);
   const [activeTab, setActiveTab] = useState('Basic Info');
   const [businessType, setBusinessType] = useState('Clinic');
   const [bio, setBio] = useState('');
@@ -55,6 +56,10 @@ const BusinessDetailsScreen = ({
   const [closingTime, setClosingTime] = useState('05:00');
   const [closingPeriod, setClosingPeriod] = useState('PM');
   const [showScheduleDetails, setShowScheduleDetails] = useState(true); // Default to true as per image
+  
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+  }, [activeTab]);
 
   // Services State
   const [selectedSpecialities, setSelectedSpecialities] = useState(['General Medicine', 'Dental', 'Pediatrics']);
@@ -231,7 +236,10 @@ const BusinessDetailsScreen = ({
           </View>
         </View>
 
-        <TouchableOpacity style={styles.saveScheduleButton}>
+        <TouchableOpacity 
+          style={styles.saveScheduleButton}
+          onPress={() => setActiveTab('Services')}
+        >
           <Text style={styles.saveScheduleText}>Save</Text>
         </TouchableOpacity>
       </View>
@@ -349,21 +357,24 @@ const BusinessDetailsScreen = ({
       </View>
 
       <ScrollView 
+        ref={scrollRef}
         style={styles.scrollView} 
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {/* Profile Image Section */}
-        <View style={styles.profileSection}>
-          <View style={styles.profileImageContainer}>
-            <View style={styles.profilePlaceholder}>
-              <Feather name="user" size={60} color="#A1A5AC" />
+        {activeTab === 'Basic Info' && (
+          <View style={styles.profileSection}>
+            <View style={styles.profileImageContainer}>
+              <View style={styles.profilePlaceholder}>
+                <Feather name="user" size={60} color="#A1A5AC" />
+              </View>
+              <TouchableOpacity style={styles.cameraButton}>
+                <Feather name="camera" size={16} color="#FFFFFF" />
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.cameraButton}>
-              <Feather name="camera" size={16} color="#FFFFFF" />
-            </TouchableOpacity>
           </View>
-        </View>
+        )}
 
         {activeTab === 'Basic Info' && renderBasicInfo()}
         {activeTab === 'Working Hours' && renderWorkingHours()}
@@ -371,10 +382,32 @@ const BusinessDetailsScreen = ({
 
         {/* Footer Buttons */}
         <View style={styles.footer}>
-          <TouchableOpacity style={styles.primaryButton} onPress={onContinue}>
+          <TouchableOpacity 
+            style={styles.primaryButton} 
+            onPress={() => {
+              if (activeTab === 'Basic Info') {
+                setActiveTab('Working Hours');
+              } else if (activeTab === 'Working Hours') {
+                setActiveTab('Services');
+              } else {
+                onContinue();
+              }
+            }}
+          >
             <Text style={styles.primaryButtonText}>Save & Continue</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.skipButton} onPress={onSkip}>
+          <TouchableOpacity 
+            style={styles.skipButton} 
+            onPress={() => {
+              if (activeTab === 'Basic Info') {
+                setActiveTab('Working Hours');
+              } else if (activeTab === 'Working Hours') {
+                setActiveTab('Services');
+              } else {
+                onSkip();
+              }
+            }}
+          >
             <Text style={styles.skipText}>Skip</Text>
           </TouchableOpacity>
         </View>

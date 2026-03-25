@@ -17,6 +17,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import { HomeIcon, ShortsIcon, DetailsIcon, ProfileIcon } from './NavigationIcons';
 
 const { width } = Dimensions.get('window');
 
@@ -76,12 +77,14 @@ const SearchScreen = ({
   onClinicPress,
   onShortsPress,
   onProfilePress,
+  onDetailsPress,
 }: {
   role: string;
   onHomePress: () => void;
   onClinicPress: (clinic: any) => void;
   onShortsPress: () => void;
   onProfilePress: () => void;
+  onDetailsPress?: () => void;
 }) => {
   const insets = useSafeAreaInsets();
   const [selectedCategoryId, setSelectedCategoryId] = useState('1');
@@ -342,24 +345,38 @@ const SearchScreen = ({
           style={[styles.bottomNav, { bottom: Math.max(insets.bottom, 20) }]}
         >
           <TouchableOpacity style={styles.navItem} onPress={onHomePress}>
-            <Feather name="home" size={24} color="#A0AEC0" />
+            <HomeIcon active={false} size={24} />
             <Text style={styles.navText}>Home</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
-            <View style={styles.navActiveIndicatorPill}>
-              <Feather name="search" size={24} color="#FFFFFF" />
-              <Text style={styles.navTextActive}>Search</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem} onPress={onShortsPress}>
-            <MaterialCommunityIcons name="play-circle-outline" size={24} color="#A0AEC0" />
-            <Text style={styles.navText}>Shorts</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.navItem} 
-            onPress={role === 'business' ? onProfilePress : () => {}}
-          >
-            <Feather name="user" size={24} color="#A0AEC0" />
+          
+          {role === 'business' ? (
+            <>
+              <TouchableOpacity style={styles.navItem} onPress={onShortsPress}>
+                <ShortsIcon active={false} size={24} />
+                <Text style={styles.navText}>Shorts</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.navItem} onPress={onDetailsPress}>
+                <DetailsIcon active={false} size={24} />
+                <Text style={styles.navText}>Details</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <TouchableOpacity style={styles.navItem}>
+                <View style={styles.navActiveIndicatorPill}>
+                  <Feather name="search" size={24} color="#FFFFFF" />
+                  <Text style={styles.navTextActive}>Search</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.navItem} onPress={onShortsPress}>
+                <ShortsIcon active={false} size={24} />
+                <Text style={styles.navText}>Shorts</Text>
+              </TouchableOpacity>
+            </>
+          )}
+
+          <TouchableOpacity style={styles.navItem} onPress={onProfilePress}>
+            <ProfileIcon active={false} size={24} />
             <Text style={styles.navText}>Profile</Text>
           </TouchableOpacity>
         </View>
