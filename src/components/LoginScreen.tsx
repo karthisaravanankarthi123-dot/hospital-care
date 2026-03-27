@@ -39,15 +39,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
-          <TouchableOpacity style={styles.backButton} onPress={onBack}>
-            <Feather name="arrow-left" size={24} color="#1A1C1E" />
-          </TouchableOpacity>
+        <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
+         
           <View style={styles.logoRow}>
             <Image 
               source={require('../../assets/logo.png')} 
               style={styles.logoImage} 
               resizeMode="contain" 
+
             />
           </View>
         </View>

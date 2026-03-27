@@ -11,7 +11,7 @@ import {
 
 const { width } = Dimensions.get('window');
 
-const SplashScreen = () => {
+const SplashScreen = ({ navigation }: { navigation: any }) => {
   const progressAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -19,8 +19,10 @@ const SplashScreen = () => {
       toValue: 1,
       duration: 4000,
       useNativeDriver: false,
-    }).start();
-  }, [progressAnim]);
+    }).start(() => {
+      navigation.replace('LoginScreen');
+    });
+  }, [progressAnim, navigation]);
 
   const progressWidth = progressAnim.interpolate({
     inputRange: [0, 1],

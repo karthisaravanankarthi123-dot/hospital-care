@@ -12,6 +12,7 @@ import {
   StatusBar,
   BackHandler,
   Keyboard,
+  Modal,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Feather from 'react-native-vector-icons/Feather';
@@ -86,6 +87,7 @@ const HomeScreen = ({
   onShortPress,
   onProfilePress,
   onDetailsPress,
+  onLogout,
   userData,
 }: {
   role?: string;
@@ -96,10 +98,12 @@ const HomeScreen = ({
   onShortPress?: (short: any) => void;
   onProfilePress: () => void;
   onDetailsPress?: () => void;
+  onLogout?: () => void;
   userData?: any;
 }) => {
   const insets = useSafeAreaInsets();
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -151,9 +155,11 @@ const HomeScreen = ({
               </View>
             </View>
           </View>
-          <TouchableOpacity style={styles.notificationButton}>
-            <View style={styles.notificationDotRed} />
-            <Feather name="bell" size={24} color="#FFFFFF" />
+          <TouchableOpacity 
+            style={styles.notificationButton}
+            onPress={() => setShowMenu(!showMenu)}
+          >
+            <Feather name="menu" size={24} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
       </View>
@@ -362,7 +368,10 @@ const HomeScreen = ({
               <View style={styles.notificationDot} />
               <Feather name="bell" size={24} color="#FFFFFF" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
+            <TouchableOpacity 
+              style={styles.iconButton}
+              onPress={() => setShowMenu(!showMenu)}
+            >
               <Feather name="menu" size={24} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
@@ -595,6 +604,45 @@ const HomeScreen = ({
           </TouchableOpacity>
         </View>
       )}
+      {/* Menu Overlay */}
+      {showMenu && (
+        <Modal
+          transparent={true}
+          visible={showMenu}
+          onRequestClose={() => setShowMenu(false)}
+          animationType="fade"
+        >
+          <TouchableOpacity 
+            style={styles.menuOverlay} 
+            activeOpacity={1} 
+            onPress={() => setShowMenu(false)}
+          >
+            <View style={[styles.menuContent, { top: insets.top + 70 }]}>
+              <TouchableOpacity 
+                style={styles.menuItem}
+                onPress={() => {
+                  setShowMenu(false);
+                  onProfilePress();
+                }}
+              >
+                <Feather name="user" size={18} color="#1A1C1E" />
+                <Text style={styles.menuItemText}>Profile</Text>
+              </TouchableOpacity>
+              <View style={styles.menuDivider} />
+              <TouchableOpacity 
+                style={styles.menuItem}
+                onPress={() => {
+                  setShowMenu(false);
+                  onLogout && onLogout();
+                }}
+              >
+                <Feather name="log-out" size={18} color="#FF3B30" />
+                <Text style={[styles.menuItemText, { color: '#FF3B30' }]}>Logout</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+      )}
     </View>
   );
 
@@ -709,6 +757,40 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#0d1b2a',
     zIndex: 1,
+  },
+  menuOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+  menuContent: {
+    position: 'absolute',
+    right: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    paddingVertical: 10,
+    width: 160,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  menuItemText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1A1C1E',
+  },
+  menuDivider: {
+    height: 1,
+    backgroundColor: '#F0F2F5',
+    marginHorizontal: 10,
   },
   // Business Scroll Content
   businessScrollContent: {

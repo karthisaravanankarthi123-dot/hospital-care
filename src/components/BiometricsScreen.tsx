@@ -20,7 +20,7 @@ const BiometricsScreen = ({
   onFaceRecognition: () => void;
 }) => {
   const insets = useSafeAreaInsets();
-  
+
   // Hardware Back Button handled by App.tsx
 
   return (

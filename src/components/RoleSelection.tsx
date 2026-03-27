@@ -41,28 +41,9 @@ const ROLES = [
   },
 ];
 
-const RoleSelection = ({ onContinue }: { onContinue: (role: string) => void }) => {
+const RoleSelection = ({ onContinue, onBack }: { onContinue: (role: string) => void; onBack: () => void }) => {
   const insets = useSafeAreaInsets();
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (Platform.OS !== 'android') return;
-
-    const handleBackPress = () => {
-      console.log('Back button pressed on RoleSelection');
-      BackHandler.exitApp();
-      return true;
-    };
-
-    const subscription = BackHandler.addEventListener(
-      'hardwareBackPress',
-      handleBackPress
-    );
-
-    return () => {
-      subscription.remove();
-    };
-  }, []);
 
   return (
     <View style={styles.container}>
